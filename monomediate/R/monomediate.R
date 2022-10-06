@@ -1,12 +1,12 @@
 monomediate <- function(data, npsem, learners, folds) {
   tmp <- data
   folds <- origami::make_folds(tmp, V = folds)
-  
-  g <- cv_g(tmp, folds, npsem, learners)
-  q <- cv_q(tmp, folds, npsem, learners)
-  r <- cv_r(tmp, folds, npsem, learners)
-  e <- cv_e(tmp, folds, npsem, learners)
-  mu <- cv_mu(tmp, folds, npsem, learners, "binomial")
+
+  g <- cv_g(tmp, folds, npsem, learners$g)
+  q <- cv_q(tmp, folds, npsem, learners$q)
+  r <- cv_r(tmp, folds, npsem, learners$r)
+  e <- cv_e(tmp, folds, npsem, learners$e)
+  mu <- cv_mu(tmp, folds, npsem, learners$mu, "binomial")
   
   tmp <- cbind(tmp, as.data.frame(mu))
   
@@ -19,7 +19,7 @@ monomediate <- function(data, npsem, learners, folds) {
       zp <- zs[2]
       
       rhos[[paste(a, ap, z, zp, sep = "_")]] <- 
-        cv_rho(tmp, folds, npsem, learners, a, ap, z, zp)
+        cv_rho(tmp, folds, npsem, learners$rho, a, ap, z, zp)
     }
   }
   

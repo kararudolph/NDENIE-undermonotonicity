@@ -7,9 +7,9 @@ gcomp_mediation_monotinicity <- function(data) {
   suppressPackageStartupMessages(require("dplyr"))
   
   tmp <- data
-  y_fit <- glm(y ~ w1 + w2 + w3 + z + m, family = "binomial", data = tmp)
-  m_fit <- glm(m ~ w3 + z, family = "binomial", data = tmp)
-  z_fit <- glm(z ~ w1 + w2 + w3 + a, family = "binomial", data = tmp)
+  y_fit <- glm(y ~ w1 + w2 + w3 + z + m, family = "binomial", data = tmp) # misspecify for 2
+  m_fit <- glm(m ~ w3 + z, family = "binomial", data = tmp) # misspecify for 4
+  z_fit <- glm(z ~ w1 + w2 + w3 + a, family = "binomial", data = tmp) # misspecify for 3
   
   pr_z_1 <- predict(z_fit, mutate(tmp, a = 1), type = "response")
   pr_z_0 <- predict(z_fit, mutate(tmp, a = 0), type = "response")

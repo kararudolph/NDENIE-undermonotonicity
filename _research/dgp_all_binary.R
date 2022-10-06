@@ -19,8 +19,8 @@ my_inst <- function(m, z, w) {
   plogis((-log(1.3)*(rowSums(w)) / 3) + z + m)
 }
 
-pzmw <- function(m, z,w) {
-  pm(m,z, 1, w) * g(1, w) + pm(m,z, 0, w) * g(0, w)
+pzmw <- function(m, z, w) {
+  pm(m, z, 1, w) * g(1, w) + pm(m, z, 0, w) * g(0, w)
 }
 
 e <- function(a, z, m, w) {
@@ -40,7 +40,7 @@ muintm <- function(z1, z2, a, w){
 }
 
 intv11 <- function(w, aprime, astar) {
-  my_inst(1, 1, w) * pz(1,astar, w) * pm(1, 1, astar, w) + 
+  my_inst(1, 1, w) * pz(1, astar, w) * pm(1, 1, astar, w) + 
     my_inst(0, 1, w) * pz(1, astar, w) * pm(0, 1, astar, w)
 }
 
