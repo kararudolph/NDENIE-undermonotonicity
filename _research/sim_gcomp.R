@@ -1,6 +1,19 @@
 library(boot)
 library(purrr)
-source("_research/dgp_all_binary.R")
+suppressPackageStartupMessages(library(tidyverse))
+
+args <- commandArgs(trailingOnly = TRUE)
+dgp <- args[[1]]
+
+if (dgp == "binary") {
+  source("_research/dgp_all_binary.R")
+  y_family <- "binomial"
+}
+
+if (dgp == "cont") {
+  source("_research/dgp_cont.R")
+  y_family <- "gaussian"
+}
 
 devtools::load_all("monomediate")
 
@@ -22,8 +35,7 @@ specs <- list(
 id <- Sys.getenv("SGE_TASK_ID")
 if (id == "undefined" || id == "") id <- 1
 
-args <- commandArgs(trailingOnly = TRUE)
-spec <- specs[[as.numeric(args[[1]])]]
+spec <- specs[[as.numeric(args[[2]])]]
 
 gmboot <- function(data, i) {
   monomediate_gcomp(data[i, ], 
@@ -31,8 +43,7 @@ gmboot <- function(data, i) {
                     spec[[1]], 
                     spec[[2]], 
                     spec[[3]], 
-                    "binomial", 
-                    "binomial")
+                    y_family)
 }
 
 npsem <- Npsem$new(c("w1", "w2", "w3"), "a", "z", "m", "y")
@@ -46,11 +57,11 @@ res <- map_dfr(c(1000, 10000), function(n) {
   
   data.frame(estimator = rep("gcomp", 2), 
              n = rep(n, 2), 
-             spec = rep(names(specs)[as.numeric(args[[1]])], 2),
+             spec = rep(names(specs)[as.numeric(args[[2]])], 2),
              estimand = c("nie", "nde"), 
              psi = as.vector(booted$t0), 
              conf_low = c(ci_nie$normal[2], ci_nde$normal[2]), 
              conf_high = c(ci_nie$normal[3], ci_nde$normal[3]))
 })
 
-write_csv(res, paste0("_research/data/sim_binary_gcomp_", args[[1]], "_", id, ".csv"))
+write_csv(res, paste0("_research/data/sim_", args[[1]], "_gcomp_", args[[2]], "_", id, ".csv"))

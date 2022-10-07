@@ -1,8 +1,8 @@
-monomediate_gcomp <- function(data, npsem, y_form, z_form, m_form, y_family, z_family) {
+monomediate_gcomp <- function(data, npsem, y_form, z_form, m_form, y_family) {
   tmp <- data
   
   y_fit <- glm(y_form, family = y_family, data = tmp)
-  z_fit <- glm(z_form, family = z_family, data = tmp)
+  z_fit <- glm(z_form, family = "binomial", data = tmp)
   
   q <- list()
   q$z1_a1 <- predict(z_fit, mutate(tmp, a = 1), type = "response")

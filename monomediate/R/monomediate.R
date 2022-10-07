@@ -1,4 +1,4 @@
-monomediate <- function(data, npsem, learners, folds) {
+monomediate <- function(data, npsem, learners, folds, y_family) {
   tmp <- data
   folds <- origami::make_folds(tmp, V = folds)
 
@@ -6,8 +6,8 @@ monomediate <- function(data, npsem, learners, folds) {
   q <- cv_q(tmp, folds, npsem, learners$q)
   r <- cv_r(tmp, folds, npsem, learners$r)
   e <- cv_e(tmp, folds, npsem, learners$e)
-  mu <- cv_mu(tmp, folds, npsem, learners$mu, "binomial")
-  
+  mu <- cv_mu(tmp, folds, npsem, learners$mu, y_family)
+
   tmp <- cbind(tmp, as.data.frame(mu))
   
   rhos <- list()

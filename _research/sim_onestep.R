@@ -1,8 +1,21 @@
 library(boot)
 library(purrr)
 library(sl3)
-source("_research/dgp_all_binary.R")
+suppressPackageStartupMessages(library(tidyverse))
 source("_research/Lrnr_glmnet3.R")
+
+args <- commandArgs(trailingOnly = TRUE)
+dgp <- args[[1]]
+
+if (dgp == "binary") {
+  source("_research/dgp_all_binary.R")
+  y_family <- "binomial"
+}
+
+if (dgp == "cont") {
+  source("_research/dgp_cont.R")
+  y_family <- "gaussian"
+}
 
 devtools::load_all("monomediate")
 
@@ -10,8 +23,8 @@ npsem <- Npsem$new(c("w1", "w2", "w3"), "a", "z", "m", "y")
 
 id <- Sys.getenv("SGE_TASK_ID")
 if (id == "undefined" || id == "") id <- 1
-args <- commandArgs(trailingOnly = TRUE)
-spec <- as.numeric(args[[1]])
+
+spec <- as.numeric(args[[2]])
 
 specs <- list(
   list(g = Lrnr_mean$new(), 
@@ -45,7 +58,7 @@ res <- map_dfr(c(1000, 10000), function(n) {
   
   folds <- ifelse(n == 1000, 10, 2)
   
-  dr <- monomediate(tmp, npsem, specs[[spec]], folds)
+  dr <- monomediate(tmp, npsem, specs[[spec]], folds, y_family)
   
   data.frame(estimator = rep("onestep", 2), 
              n = rep(n, 2), 
@@ -56,4 +69,4 @@ res <- map_dfr(c(1000, 10000), function(n) {
              conf_high = c(dr$ci_nie[2], dr$ci_nde[2]))
 })
 
-write_csv(res, paste0("_research/data/sim_binary_onestep_", args[[1]], "_", id, ".csv"))
+write_csv(res, paste0("_research/data/sim_", args[[1]], "_onestep_", args[[2]], "_", id, ".csv"))
