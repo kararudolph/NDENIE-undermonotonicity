@@ -16,7 +16,7 @@ simdata <- function(n = 1000) {
              y = y)
 }
 
-truth_dgp_cont <- function() {
+truth <- function() {
   tmp <- expand.grid(w1 = c(1, 0), w2 = c(1, 0), w3 = c(1, 0))
   
   prob_w <- vector("numeric", nrow(tmp))

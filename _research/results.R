@@ -11,16 +11,13 @@ read_zip <- function(tar) {
   })
 }
 
-nie <- 0.034
-nde <- 0.099
-
 local({
-  source("_research/dgp_cont.R")
-  nde <<- truth_dgp_cont()["nde"]
-  nie <<- truth_dgp_cont()["nie"]
+  source("_research/dgp_mult_m.R")
+  nde <<- truth()["nde"]
+  nie <<- truth()["nie"]
 })
 
-basepath <- "_research/data/sim_binary_gcomp_"
+basepath <- "_research/data/sim_mult_onestep_"
 
 res <- map_dfr(1:4, \(x) bind_rows(read_zip(paste0(basepath, x, ".zip"))))
 
