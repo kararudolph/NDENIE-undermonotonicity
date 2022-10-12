@@ -1,3 +1,16 @@
+#' Parametric mediation estimator under monotonicity assumption
+#'
+#' @param data 
+#' @param npsem 
+#' @param y_form 
+#' @param z_form 
+#' @param m_form 
+#' @param y_family 
+#'
+#' @return
+#' @export
+#'
+#' @examples
 monomediate_gcomp <- function(data, npsem, y_form, z_form, m_form, y_family) {
   tmp <- data
   
