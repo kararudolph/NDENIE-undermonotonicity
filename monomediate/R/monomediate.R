@@ -1,3 +1,15 @@
+#' One-step mediation estimator under monotonicity assumption
+#'
+#' @param data 
+#' @param npsem 
+#' @param learners 
+#' @param folds 
+#' @param y_family 
+#'
+#' @return
+#' @export
+#'
+#' @examples
 monomediate <- function(data, npsem, learners, folds, y_family) {
   tmp <- data
   folds <- origami::make_folds(tmp, V = folds)

@@ -1,19 +1,31 @@
+#' Parametric mediation estimator under monotonicity assumption
+#'
+#' @param data 
+#' @param npsem 
+#' @param y_form 
+#' @param z_form 
+#' @param m_form 
+#' @param y_family 
+#'
+#' @return
+#' @export
+#'
+#' @examples
 monomediate_gcomp <- function(data, npsem, y_form, z_form, m_form, y_family) {
   tmp <- data
-  
   y_fit <- glm(y_form, family = y_family, data = tmp)
   z_fit <- glm(z_form, family = "binomial", data = tmp)
-  
+
   q <- list()
-  q$z1_a1 <- predict(z_fit, mutate(tmp, a = 1), type = "response")
+  q$z1_a1 <- predict(z_fit, mutate(tmp, "{npsem$A}" := 1), type = "response")
   q$z0_a1 <- 1 - q$z1_a1
-  q$z1_a0 <- predict(z_fit, mutate(tmp, a = 0), type = "response")
+  q$z1_a0 <- predict(z_fit, mutate(tmp, "{npsem$A}" := 0), type = "response")
   q$z0_a0 <- 1 - q$z1_a0
   
-  tmp$a1_z1 <- predict(y_fit, mutate(tmp, a = 1, z = 1), type = "response")
-  tmp$a1_z0 <- predict(y_fit, mutate(tmp, a = 1, z = 0), type = "response")
-  tmp$a0_z1 <- predict(y_fit, mutate(tmp, a = 0, z = 1), type = "response")
-  tmp$a0_z0 <- predict(y_fit, mutate(tmp, a = 0, z = 0), type = "response")
+  tmp$a1_z1 <- predict(y_fit, mutate(tmp, "{npsem$A}" := 1, "{npsem$Z}" := 1), type = "response")
+  tmp$a1_z0 <- predict(y_fit, mutate(tmp, "{npsem$A}" := 1, "{npsem$Z}" := 0), type = "response")
+  tmp$a0_z1 <- predict(y_fit, mutate(tmp, "{npsem$A}" := 0, "{npsem$Z}" := 1), type = "response")
+  tmp$a0_z0 <- predict(y_fit, mutate(tmp, "{npsem$A}" := 0, "{npsem$Z}" := 0), type = "response")
   
   rhos <- list()
   for (as in list(c(1, 1), c(1, 0), c(0, 0))) {
@@ -27,7 +39,7 @@ monomediate_gcomp <- function(data, npsem, y_form, z_form, m_form, y_family) {
       rho_fit <- glm(m_form_new, family = "gaussian", data = tmp)
       
       rhos[[paste(a, ap, z, zp, sep = "_")]] <- 
-        predict(rho_fit, mutate(tmp, a = ap, z = zp), type = "response")
+        predict(rho_fit, mutate(tmp, "{npsem$A}" := ap, "{npsem$Z}" := zp), type = "response")
     }
   }
   
