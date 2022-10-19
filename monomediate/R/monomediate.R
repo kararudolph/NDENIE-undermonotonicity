@@ -58,7 +58,7 @@ monomediate <- function(data, npsem, learners, folds, y_family) {
     `P(a'|M,0,W)` <- e[[paste0("a", ap, "_z0")]]
     `E(Y|a,M,1,W)` <- mu[[paste0("a", a, "_z1")]]
     `E(Y|a,M,0,W)` <- mu[[paste0("a", a, "_z0")]]
-    
+
     H_Y11 <- ((Z == 1 & A == a) / `P(a'|W)`) * (`P(a'|M,1,W)` / `P(a|M,1,W)`)
     H_Y10 <- ((Z == 1 & A == a) / (`P(a'|W)` * `P(Z=0|a',W)`)) * 
       ((`P(a'|M,1,W)` / `P(a|M,1,W)`) * (`P(Z=0|M,a',W)` / `P(Z=1|M,a',W)`)) * 

@@ -2,11 +2,13 @@ library(boot)
 library(purrr)
 suppressPackageStartupMessages(library(tidyverse))
 
+devtools::load_all("monomediate")
+
 args <- commandArgs(trailingOnly = TRUE)
 dgp <- args[[1]]
 
 if (dgp == "binary") {
-  source("_research/dgp_all_binary.R")
+  source("_research/dgp_binary.R")
   y_family <- "binomial"
 }
 
@@ -15,7 +17,7 @@ if (dgp == "cont") {
   y_family <- "gaussian"
 }
 
-devtools::load_all("monomediate")
+npsem <- Npsem$new(c("w1", "w2", "w3"), "a", "z", "m", "y")
 
 specs <- list(
   correct = c(y ~ w1 + w2 + w3 + z + m, 
@@ -32,6 +34,27 @@ specs <- list(
                     ~ 1)
 )
 
+if (dgp == "mult") {
+  source("_research/dgp_mult.R")
+  y_family <- "binomial"
+  npsem <- Npsem$new(c("w1", "w2", "w3"), "a", "z", c("m1", "m2"), "y")
+  
+  specs <- list(
+    correct = c(y ~ w1 + w2 + w3 + z + m1 + m2, 
+                z ~ w1 + w2 + w3 + a, 
+                ~ w3 + z),
+    "y incorrect" = c(y ~ 1, 
+                      z ~ w1 + w2 + w3 + a, 
+                      ~ w3 + z), 
+    "z incorrect" = c(y ~ w1 + w2 + w3 + z + m1 + m2, 
+                      z ~ 1, 
+                      ~ w3 + z), 
+    "m incorrect" = c(y ~ w1 + w2 + w3 + z + m1 + m2, 
+                      z ~ w1 + w2 + w3 + a, 
+                      ~ 1)
+  )
+}
+
 id <- Sys.getenv("SGE_TASK_ID")
 if (id == "undefined" || id == "") id <- 1
 
@@ -46,8 +69,6 @@ gmboot <- function(data, i) {
                     y_family)
 }
 
-npsem <- Npsem$new(c("w1", "w2", "w3"), "a", "z", "m", "y")
-
 res <- map_dfr(c(1000, 10000), function(n) {
   tmp <- simdata(n)
   
@@ -60,6 +81,7 @@ res <- map_dfr(c(1000, 10000), function(n) {
              spec = rep(names(specs)[as.numeric(args[[2]])], 2),
              estimand = c("nie", "nde"), 
              psi = as.vector(booted$t0), 
+             var = c(var(booted$t[, 1]), var(booted$t[, 2])),
              conf_low = c(ci_nie$normal[2], ci_nde$normal[2]), 
              conf_high = c(ci_nie$normal[3], ci_nde$normal[3]))
 })

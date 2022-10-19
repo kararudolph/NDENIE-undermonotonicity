@@ -9,7 +9,7 @@ args <- commandArgs(trailingOnly = TRUE)
 dgp <- args[[1]]
 
 if (dgp == "binary") {
-  source("_research/dgp_all_binary.R")
+  source("_research/dgp_binary.R")
   y_family <- "binomial"
   npsem <- Npsem$new(c("w1", "w2", "w3"), "a", "z", "m", "y")
 }
@@ -21,7 +21,7 @@ if (dgp == "cont") {
 }
 
 if (dgp == "mult") {
-  source("_research/dgp_mult_m.R")
+  source("_research/dgp_mult.R")
   y_family <- "binomial"
   npsem <- Npsem$new(c("w1", "w2", "w3"), "a", "z", c("m1", "m2"), "y")
 }
@@ -32,30 +32,41 @@ if (id == "undefined" || id == "") id <- 1
 spec <- as.numeric(args[[2]])
 
 specs <- list(
+  # All correct
   list(g = Lrnr_mean$new(), 
        q = Lrnr_glmnet3$new(), 
        e = Lrnr_glmnet3$new(), 
        r = Lrnr_glmnet3$new(), 
        mu = Lrnr_glmnet3$new(), 
        rho = Lrnr_glmnet3$new()), 
+  # g, q, e, r correct
   list(g = Lrnr_mean$new(), 
        q = Lrnr_glmnet3$new(), 
        e = Lrnr_glmnet3$new(), 
        r = Lrnr_glmnet3$new(), 
        mu = Lrnr_mean$new(), 
        rho = Lrnr_mean$new()), 
+  # mu, rho, g correct
   list(g = Lrnr_mean$new(), 
        q = Lrnr_mean$new(), 
        e = Lrnr_mean$new(), 
        r = Lrnr_mean$new(), 
        mu = Lrnr_glmnet3$new(), 
        rho = Lrnr_glmnet3$new()), 
+  # mu, rho, q correct
   list(g = Lrnr_mean$new(), 
        q = Lrnr_glmnet3$new(), 
        e = Lrnr_mean$new(), 
        r = Lrnr_mean$new(), 
        mu = Lrnr_glmnet3$new(), 
-       rho = Lrnr_glmnet3$new())
+       rho = Lrnr_glmnet3$new()), 
+  # g, q, mu correct
+  list(g = Lrnr_mean$new(), 
+       q = Lrnr_glmnet3$new(), 
+       e = Lrnr_mean$new(), 
+       r = Lrnr_mean$new(), 
+       mu = Lrnr_glmnet3$new(), 
+       rho = Lrnr_mean$new())
 )
 
 res <- map_dfr(c(1000, 10000), function(n) {
@@ -70,6 +81,7 @@ res <- map_dfr(c(1000, 10000), function(n) {
              spec = rep(spec, 2),
              estimand = c("nie", "nde"), 
              psi = c(dr$nie, dr$nde), 
+             var = c(dr$var_nie, dr$var_nde),
              conf_low = c(dr$ci_nie[1], dr$ci_nde[1]), 
              conf_high = c(dr$ci_nie[2], dr$ci_nde[2]))
 })
