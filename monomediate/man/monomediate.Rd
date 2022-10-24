@@ -7,16 +7,37 @@
 monomediate(data, npsem, learners, folds, y_family)
 }
 \arguments{
-\item{data}{}
+\item{data}{[\code{data.frame}]\cr
+A \code{data.frame} containing all necessary variables
+for the estimation problem.}
 
-\item{npsem}{}
+\item{npsem}{[\code{R6(Npsem)}]\cr
+An \code{Npsem} object}
 
-\item{learners}{}
+\item{learners}{[\code{list(6)}]\cr
+A named list ("g", "q", "r", "e", "mu", "rho") of \code{sl3} learners.}
 
-\item{folds}{}
+\item{folds}{[\code{integer(1)}]\cr
+The number of folds to be used for cross-fitting.}
 
-\item{y_family}{}
+\item{y_family}{[\code{character(1)}]\cr
+Outcome variable type (i.e., "gaussian", "binomial").}
+}
+\value{
+Natural (in)direct effect estimates and estimated variance
 }
 \description{
 One-step mediation estimator under monotonicity assumption
+}
+\examples{
+library(sl3)
+npsem <- Npsem$new(c("w1", "w2", "w3"), "a", "z", c("m1", "m2"), "y")
+lrnrs <- list(g = Lrnr_mean$new(), 
+              q = Lrnr_glm$new(), 
+              e = Lrnr_glm$new(), 
+              r = Lrnr_glm$new(), 
+              mu = Lrnr_glm$new(), 
+              rho = Lrnr_glm$new())
+
+monomediate(multiple_m, npsem, lrnrs, 10, "binomial")
 }

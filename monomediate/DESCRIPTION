@@ -24,6 +24,9 @@ LazyData: true
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.2.1
 Imports: 
-    data.table,
-    R6,
-    sl3
+    dplyr,
+    R6
+Depends: 
+    R (>= 2.10)
+Remotes: 
+    tlverse/sl3 (>= 1.4.4)
