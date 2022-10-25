@@ -1,15 +1,31 @@
 #' One-step mediation estimator under monotonicity assumption
 #'
-#' @param data 
-#' @param npsem 
-#' @param learners 
-#' @param folds 
-#' @param y_family 
+#' @param data \[\code{data.frame}\]\cr
+#'  A \code{data.frame} containing all necessary variables
+#'  for the estimation problem.
+#' @param npsem \[\code{R6(Npsem)}\]\cr
+#'  An \code{Npsem} object 
+#' @param learners \[\code{list(6)}\]\cr
+#'  A named list ("g", "q", "r", "e", "mu", "rho") of \code{sl3} learners.
+#' @param folds \[\code{integer(1)}\]\cr
+#'  The number of folds to be used for cross-fitting.
+#' @param y_family \[\code{character(1)}\]\cr
+#'  Outcome variable type (i.e., "gaussian", "binomial").
 #'
-#' @return
+#' @return Natural (in)direct effect estimates and estimated variance
 #' @export
 #'
 #' @examples
+#' library(sl3)
+#' npsem <- Npsem$new(c("w1", "w2", "w3"), "a", "z", c("m1", "m2"), "y")
+#' lrnrs <- list(g = Lrnr_mean$new(), 
+#'               q = Lrnr_glm$new(), 
+#'               e = Lrnr_glm$new(), 
+#'               r = Lrnr_glm$new(), 
+#'               mu = Lrnr_glm$new(), 
+#'               rho = Lrnr_glm$new())
+#' 
+#' monomediate(multiple_m, npsem, lrnrs, 10, "binomial")
 monomediate <- function(data, npsem, learners, folds, y_family) {
   tmp <- data
   folds <- origami::make_folds(tmp, V = folds)
@@ -58,7 +74,7 @@ monomediate <- function(data, npsem, learners, folds, y_family) {
     `P(a'|M,0,W)` <- e[[paste0("a", ap, "_z0")]]
     `E(Y|a,M,1,W)` <- mu[[paste0("a", a, "_z1")]]
     `E(Y|a,M,0,W)` <- mu[[paste0("a", a, "_z0")]]
-    
+
     H_Y11 <- ((Z == 1 & A == a) / `P(a'|W)`) * (`P(a'|M,1,W)` / `P(a|M,1,W)`)
     H_Y10 <- ((Z == 1 & A == a) / (`P(a'|W)` * `P(Z=0|a',W)`)) * 
       ((`P(a'|M,1,W)` / `P(a|M,1,W)`) * (`P(Z=0|M,a',W)` / `P(Z=1|M,a',W)`)) * 
